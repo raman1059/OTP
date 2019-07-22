@@ -1,14 +1,12 @@
 const RC = require('ringcentral')
 
-RECIPIENT = +19494324770
-
-RINGCENTRAL_CLIENTID = 'K8j5BB_aT9ynoYZ1-e5P3A'
-RINGCENTRAL_CLIENTSECRET = '7oTjAGYfQqqoN0TfBBL8TAr-8riCm1TA22N6mcLuJZmg'
-RINGCENTRAL_SERVER = 'https://platform.devtest.ringcentral.com'
-
-RINGCENTRAL_USERNAME = +12055120243
-RINGCENTRAL_PASSWORD = "Bhtpl@123"
-RINGCENTRAL_EXTENSION = 101
+// RECIPIENT = +19494324770
+// RINGCENTRAL_CLIENTID = 'K8j5BB_aT9ynoYZ1-e5P3A'
+// RINGCENTRAL_CLIENTSECRET = '7oTjAGYfQqqoN0TfBBL8TAr-8riCm1TA22N6mcLuJZmg'
+// RINGCENTRAL_SERVER = 'https://platform.devtest.ringcentral.com'
+// RINGCENTRAL_USERNAME = +12055120243
+// RINGCENTRAL_PASSWORD = "Bhtpl@123"
+// RINGCENTRAL_EXTENSION = 101
 
 var rcsdk = new RC({
     server: "https://platform.devtest.ringcentral.com",
@@ -25,18 +23,17 @@ platform.login({
         send_sms()
     });
 
-function send_sms() {
+function send_sms(val) {
     platform.post('/account/~/extension/~/sms', {
             from: {
                 'phoneNumber': +12055120243
             },
             to: [{
 
-                'phoneNumber': +19494324770
+                'phoneNumber': +12052891317
+
             }],
-            text: 'Hello World from JavaScript'
+            text: `'Your OTP is ${val} '`
         })
-        .then(function (resp) {
-            console.log("SMS sent. Message status: " + resp.JSON().messageStatus)
-        });
 }
+exports.send_sms = send_sms

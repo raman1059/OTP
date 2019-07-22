@@ -1,5 +1,7 @@
 var db = require('./db');
 var md5 = require('md5');
+const sms = require("./sms");
+
 
 exports.registerUser = function (req, res) {
     var body = {
@@ -24,6 +26,7 @@ exports.registerUser = function (req, res) {
             var hashed_password = md5(`${body.password.value}`)
             var sql = `INSERT INTO temp_data(otp, mobile_no, password, email, user_name) VALUES( '${val}', '${body.mobile_no.value}', '${hashed_password}','${body.email.value}', '${body.user_name.value}')`;
             db.query(sql, function (err) {
+                sms.send_sms(val);
                 res.status(200).send("OTP Sent");
             });
 
@@ -75,20 +78,22 @@ exports.forgotPassword = function (req, res) {
     var sql = `SELECT * FROM temp_data WHERE mobile_no = ${body.mobile_no.value}`;
     db.query(sql, [], function (err, get_record) {
         if (get_record[0]) {
-            var time_difference = ((new Date().getTime() - get_record[0].last_updated.getTime()) / 1000)
+            var time_difference = ((new Date().getTime() - get_record[0].last_updated.getTime()) / 1000);
+            var val = Math.floor(1000 + Math.random() * 9000);
             if (get_record[0].retry <= 3) {
                 var sql = ` UPDATE temp_data SET otp = ${val}, retry = retry + 1, last_updated = NOW() WHERE mobile_no = ${body.mobile_no.value} `;
                 db.query(sql, function (err) {
-                    console.log("New OTP Sent 1 ");
+                    sms.send_sms(val);
+                    console.log("New OTP Sent ");
                 });
 
             } else if (get_record[0].retry > 3 && time_difference < 86400) {
                 console.log("Please try again after some time");
 
             } else if (get_record[0].retry > 3 && time_difference > 86400) {
-                var val = OTP();
                 var sql = `UPDATE temp_data SET otp = ${val}, retry = 1, last_updated = NOW() WHERE mobile_no = ${body.mobile_no.value}`;
                 db.query(sql, function (err) {
+                    sms.send_sms(val);
                     console.log("New OTP Sent ");
                 });
             }
